@@ -1,11 +1,11 @@
-import java.awt.*;
+package com.aoli.tank;
+
 import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) {
         TankFrame tf = new TankFrame();
         tf.setVisible(true);
-
         for (;;){
             try{
                 TimeUnit.MILLISECONDS.sleep(25);
@@ -14,7 +14,6 @@ public class Main {
             }
             tf.repaint();
         }
-
     }
 
 
