@@ -7,7 +7,7 @@ import com.aoli.tank.strategies.FourDirFire;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public class Player {
+public class Player extends AbstractGameObjects{
     public static final int SPEED = 5;
     private int x, y;
     private boolean bL, bU, bR, bD;

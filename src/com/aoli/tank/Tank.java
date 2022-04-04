@@ -5,9 +5,10 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.BitSet;
 import java.util.Random;
 
-public class Tank {
+public class Tank extends AbstractGameObjects{
     private int x, y;
     public static final int SPEED = 5;
     private boolean bL, bU, bR, bD;
@@ -15,6 +16,7 @@ public class Tank {
     private Group group;
     private boolean isLive = true;
     private int width, height;
+    private Rectangle rect;
 
     private int oldX, oldY;
 
@@ -63,6 +65,7 @@ public class Tank {
         oldY = y;
         this.width = ResourceMgr.goodTankU.getWidth();
         this.height = ResourceMgr.goodTankU.getHeight();
+        rect = new Rectangle(x, y, width, height);
     }
 
     public void paint(Graphics g) {
@@ -84,6 +87,9 @@ public class Tank {
                 break;
         }
         move();
+        // update rect
+        rect.x = x;
+        rect.y = y;
     }
 
     private void move() {
@@ -137,8 +143,12 @@ public class Tank {
         }
     }
 
-    private void back() {
+    public void back() {
         this.x = oldX;
         this.y = oldY;
+    }
+
+    public Rectangle getRect() {
+        return rect;
     }
 }

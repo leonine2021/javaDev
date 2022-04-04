@@ -2,18 +2,32 @@ package com.aoli.tank;
 
 import java.awt.*;
 
-public class Bullet {
+public class Bullet extends AbstractGameObjects{
     public static final int SPEED = 10;
     private int x, y;
     private Dir dir;
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
     private Group group;
     private boolean isLive = true;
+
+    private Rectangle rect;
+    private int w = ResourceMgr.bulletU.getWidth();
+    private int h = ResourceMgr.bulletU.getHeight();
 
     public Bullet(int x, int y, Dir dir, Group group) {
         this.x = x;
         this.y = y;
         this.dir = dir;
         this.group = group;
+        this.rect = new Rectangle(x, y, w, h);
     }
 
     public boolean isLive() {
@@ -40,6 +54,9 @@ public class Bullet {
                 break;
         }
         move();
+        // update the rect
+        rect.x = x;
+        rect.y = y;
     }
 
     private void move() {
@@ -57,19 +74,15 @@ public class Bullet {
                 y -= SPEED;
                 break;
         }
-
         boundsCheck();
     }
 
     public void collidesWithTank(Tank tank) {
-        if (!this.isLive() || !tank.isLive()) return;
-        if (this.group == tank.getGroup()) return;
-        Rectangle rect = new Rectangle(x, y, ResourceMgr.bulletU.getWidth(), ResourceMgr.bulletU.getHeight());
-        Rectangle rectTank = new Rectangle(tank.getX(), tank.getY(), ResourceMgr.goodTankU.getWidth(), ResourceMgr.goodTankU.getHeight());
-        if (rect.intersects(rectTank)){
-            this.die();
-            tank.die();
-        }
+
+    }
+
+    public Rectangle getRect(){
+        return rect;
     }
 
     private void boundsCheck() {
@@ -81,4 +94,6 @@ public class Bullet {
     public void die(){
         this.setLive(false);
     }
+
+
 }

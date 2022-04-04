@@ -1,4 +1,5 @@
 initTankCnt=5
 gameWidth=800
 gameHeight=600
-tankFireStrategy=DefaultFire
+tankFireStrategy=FourDirFire
+colliders=BulletTankCollider,BulletWallCollider,TankWallCollider

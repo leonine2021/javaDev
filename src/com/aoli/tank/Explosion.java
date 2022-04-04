@@ -2,7 +2,7 @@ package com.aoli.tank;
 
 import java.awt.*;
 
-public class Explosion {
+public class Explosion extends AbstractGameObjects{
     private int x, y;
     private int width, height;
     private int step = 0;
