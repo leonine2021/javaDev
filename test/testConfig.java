@@ -5,6 +5,7 @@ import java.util.Properties;
 
 public class testConfig {
     public static void main(String[] args) {
-        System.out.println(PropMgr.get("initTankCnt"));
+        System.out.println(PropMgr.get("gameWidth"));
+        System.out.println(PropMgr.get("gameHeight"));
     }
 }

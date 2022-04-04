@@ -1,15 +1,29 @@
 package com.aoli.tank;
 
+import com.aoli.tank.strategies.DefaultFire;
+import com.aoli.tank.strategies.FireStrategy;
+import com.aoli.tank.strategies.FourDirFire;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class Player {
-    private int x, y;
     public static final int SPEED = 5;
+    private int x, y;
     private boolean bL, bU, bR, bD;
     private boolean moving = false;
     private Group group;
     private boolean isLive = true;
+    private Dir dir = Dir.R;
+
+    public Player(int x, int y, Dir dir, Group group){
+        this.x = x;
+        this.y = y;
+        this.dir = dir;
+        this.group = group;
+        // initialize the fire strategy only once from config file
+        this.initFireStrategy();
+    }
 
     public boolean isLive() {
         return isLive;
@@ -35,15 +49,21 @@ public class Player {
         this.y = y;
     }
 
-    private Dir dir = Dir.R;
-    //记录键盘是否按下的变量
+    public Dir getDir() {
+        return dir;
+    }
 
+    public Group getGroup() {
+        return group;
+    }
 
-    public Player(int x, int y, Dir dir, Group group){
-        this.x = x;
-        this.y = y;
-        this.dir = dir;
+    public void setGroup(Group group) {
         this.group = group;
+    }
+//记录键盘是否按下的变量
+
+    public void setDir(Dir dir) {
+        this.dir = dir;
     }
 
     public void paint(Graphics g) {
@@ -149,12 +169,20 @@ public class Player {
         setMainDir();
     }
 
-    private void fire() {
-        int bx = x + ResourceMgr.goodTankU.getWidth()/2 - ResourceMgr.bulletU.getWidth()/2;
-        int by = y + ResourceMgr.goodTankU.getHeight()/2 - ResourceMgr.bulletU.getHeight()/2;
-        TankFrame.INSTANCE.add(new Bullet(bx, by, dir, group));
+    private FireStrategy strategy = null;
+    private void initFireStrategy(){
+        String className = PropMgr.get("tankFireStrategy");
+        try {
+            Class cls = Class.forName("com.aoli.tank.strategies." + className);
+            strategy = (FireStrategy) (cls.getDeclaredConstructor().newInstance());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    private void fire() {
+        strategy.fire(this);
+    }
     public void die() {
         this.setLive(false);
     }
