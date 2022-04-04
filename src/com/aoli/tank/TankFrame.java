@@ -11,8 +11,8 @@ public class TankFrame extends Frame {
 
     private Player myTank;
     private List<Tank> tanks;
-    public static final int GAME_WIDTH = 800;
-    public static final int GAME_HEIGHT = 600;
+    public static final int GAME_WIDTH = Integer.parseInt(PropMgr.get("gameWidth"));
+    public static final int GAME_HEIGHT = Integer.parseInt(PropMgr.get("gameHeight"));
     private List<Bullet> bullets;
     private List<Explosion> explodes;
 
@@ -31,8 +31,9 @@ public class TankFrame extends Frame {
         bullets = new ArrayList<>();
         tanks = new ArrayList<>();
         explodes = new ArrayList<>();
+        int tankCount = Integer.parseInt(PropMgr.get("initTankCnt"));
 
-        for (int i = 0; i < 10; i++){
+        for (int i = 0; i < tankCount; i++){
             tanks.add(new Tank(100 + 50*i, 200, Dir.D, Group.BAD));
         }
 
