@@ -5,108 +5,93 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Random;
 
 public class Tank {
     private int x, y;
     public static final int SPEED = 5;
     private boolean bL, bU, bR, bD;
-    private boolean moving = false;
+    private boolean moving = true;
     private Group group;
-    TankFrame tf;
+    private boolean isLive = true;
+    private int width, height;
+
+    private int oldX, oldY;
+
+    public boolean isLive() {
+        return isLive;
+    }
+
+    public void setLive(boolean live) {
+        isLive = live;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
 
     private Dir dir = Dir.R;
     //记录键盘是否按下的变量
 
 
-    public Tank(int x, int y, Dir dir, Group group, TankFrame tf){
+    public Tank(int x, int y, Dir dir, Group group){
         this.x = x;
         this.y = y;
         this.dir = dir;
         this.group = group;
-        this.tf = tf;
+        oldX = x;
+        oldY = y;
+        this.width = ResourceMgr.goodTankU.getWidth();
+        this.height = ResourceMgr.goodTankU.getHeight();
     }
 
     public void paint(Graphics g) {
-        if (this.group == Group.GOOD){
-            switch (dir){
-                case L:
-                    g.drawImage(ResourceMgr.goodTankL, x, y, null);
-                    break;
-                case U:
-                    g.drawImage(ResourceMgr.goodTankU, x, y, null);
-                    break;
-                case R:
-                    g.drawImage(ResourceMgr.goodTankR, x, y, null);
-                    break;
-                case D:
-                    g.drawImage(ResourceMgr.goodTankD, x, y, null);
-                    break;
-            }
-        }
 
-        if (this.group == Group.BAD){
-            switch (dir){
-                case L:
-                    g.drawImage(ResourceMgr.badTankL, x, y, null);
-                    break;
-                case U:
-                    g.drawImage(ResourceMgr.badTankU, x, y, null);
-                    break;
-                case R:
-                    g.drawImage(ResourceMgr.badTankR, x, y, null);
-                    break;
-                case D:
-                    g.drawImage(ResourceMgr.badTankD, x, y, null);
-                    break;
-            }
+        if (!this.isLive()) return;
+
+        switch (dir){
+            case L:
+                g.drawImage(ResourceMgr.badTankL, x, y, null);
+                break;
+            case U:
+                g.drawImage(ResourceMgr.badTankU, x, y, null);
+                break;
+            case R:
+                g.drawImage(ResourceMgr.badTankR, x, y, null);
+                break;
+            case D:
+                g.drawImage(ResourceMgr.badTankD, x, y, null);
+                break;
         }
         move();
     }
 
-    public void keyPressed(KeyEvent e) {
-        int key = e.getKeyCode();
-        switch (key) {
-            case KeyEvent.VK_LEFT:
-                bL = true;
-                break;
-            case KeyEvent.VK_DOWN:
-                bD = true;
-                break;
-            case KeyEvent.VK_RIGHT:
-                bR = true;
-                break;
-            case KeyEvent.VK_UP:
-                bU = true;
-                break;
-        }
-        setMainDir();
-    }
-
-    private void setMainDir() {
-        // all keys are released
-        if (!bD && !bL && !bU && !bR){
-            moving = false;
-        }
-        else {
-            // any key is pressed
-            moving = true;
-            if (bD && !bL && !bU && !bR) {
-                dir = Dir.D;
-            }
-            if (!bD && bL && !bU && !bR) {
-                dir = Dir.L;
-            }
-            if (!bD && !bL && bU && !bR) {
-                dir = Dir.U;
-            }
-            if (!bD && !bL && !bU && bR) {
-                dir = Dir.R;
-            }
-        }
-    }
-
     private void move() {
         if (!moving) return;
+
+        oldX = x;
+        oldY = y;
+
         switch (dir){
             case L:
                 x -= SPEED;
@@ -121,31 +106,39 @@ public class Tank {
                 y -= SPEED;
                 break;
         }
+        boundsCheck();
+        randomDir();
+        if (random.nextInt(100) > 90) {
+            fire();
+        }
     }
 
-    public void keyReleased(KeyEvent e) {
-        int key = e.getKeyCode();
-        switch (key) {
-            case KeyEvent.VK_LEFT:
-                bL = false;
-                break;
-            case KeyEvent.VK_DOWN:
-                bD = false;
-                break;
-            case KeyEvent.VK_RIGHT:
-                bR = false;
-                break;
-            case KeyEvent.VK_UP:
-                bU = false;
-                break;
-            case KeyEvent.VK_CONTROL:
-                fire();
-                break;
+    private Random random = new Random();
+    private void randomDir() {
+        if (random.nextInt(100) > 90) {
+            this.dir = Dir.randomDir();
         }
-        setMainDir();
     }
 
     private void fire() {
-        tf.add(new Bullet(x, y, dir, group));
+        int bx = x + ResourceMgr.goodTankU.getWidth()/2 - ResourceMgr.bulletU.getWidth()/2;
+        int by = y + ResourceMgr.goodTankU.getHeight()/2 - ResourceMgr.bulletU.getHeight()/2;
+        TankFrame.INSTANCE.add(new Bullet(bx, by, dir, group));
+    }
+
+    public void die() {
+        this.setLive(false);
+        TankFrame.INSTANCE.add(new Explosion(x, y));
+    }
+
+    private void boundsCheck() {
+        if (x < 0 || x + width > TankFrame.GAME_WIDTH || y < 30 || y + height > TankFrame.GAME_HEIGHT){
+            this.back();
+        }
+    }
+
+    private void back() {
+        this.x = oldX;
+        this.y = oldY;
     }
 }

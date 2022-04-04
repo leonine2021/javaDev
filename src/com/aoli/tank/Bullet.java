@@ -3,16 +3,25 @@ package com.aoli.tank;
 import java.awt.*;
 
 public class Bullet {
+    public static final int SPEED = 10;
     private int x, y;
     private Dir dir;
     private Group group;
-    public static final int SPEED = 10;
+    private boolean isLive = true;
 
     public Bullet(int x, int y, Dir dir, Group group) {
         this.x = x;
         this.y = y;
         this.dir = dir;
         this.group = group;
+    }
+
+    public boolean isLive() {
+        return isLive;
+    }
+
+    public void setLive(boolean live) {
+        isLive = live;
     }
 
     public void paint(Graphics g) {
@@ -48,5 +57,28 @@ public class Bullet {
                 y -= SPEED;
                 break;
         }
+
+        boundsCheck();
+    }
+
+    public void collidesWithTank(Tank tank) {
+        if (!this.isLive() || !tank.isLive()) return;
+        if (this.group == tank.getGroup()) return;
+        Rectangle rect = new Rectangle(x, y, ResourceMgr.bulletU.getWidth(), ResourceMgr.bulletU.getHeight());
+        Rectangle rectTank = new Rectangle(tank.getX(), tank.getY(), ResourceMgr.goodTankU.getWidth(), ResourceMgr.goodTankU.getHeight());
+        if (rect.intersects(rectTank)){
+            this.die();
+            tank.die();
+        }
+    }
+
+    private void boundsCheck() {
+        if (x < 0 || x > TankFrame.GAME_WIDTH || y < 30 || y > TankFrame.GAME_HEIGHT){
+            isLive = false;
+        }
+    }
+
+    public void die(){
+        this.setLive(false);
     }
 }
