@@ -1,11 +1,6 @@
 package com.aoli.tank;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.BitSet;
 import java.util.Random;
 
 public class Tank extends AbstractGameObjects{
@@ -129,12 +124,12 @@ public class Tank extends AbstractGameObjects{
     private void fire() {
         int bx = x + ResourceMgr.goodTankU.getWidth()/2 - ResourceMgr.bulletU.getWidth()/2;
         int by = y + ResourceMgr.goodTankU.getHeight()/2 - ResourceMgr.bulletU.getHeight()/2;
-        TankFrame.INSTANCE.add(new Bullet(bx, by, dir, group));
+        TankFrame.INSTANCE.getGm().add(new Bullet(bx, by, dir, group));
     }
 
     public void die() {
         this.setLive(false);
-        TankFrame.INSTANCE.add(new Explosion(x, y));
+        TankFrame.INSTANCE.getGm().add(new Explosion(x, y));
     }
 
     private void boundsCheck() {

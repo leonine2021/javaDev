@@ -33,6 +33,5 @@ public class ColliderChain implements Collider{
             }
         }
         return true;
-
     }
 }
