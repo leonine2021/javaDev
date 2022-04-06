@@ -3,6 +3,7 @@ package com.aoli.tank;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.*;
 
 public class TankFrame extends Frame {
     public static final TankFrame INSTANCE = new TankFrame(); // 把Tankframe单例化
@@ -27,12 +28,56 @@ public class TankFrame extends Frame {
     private class TankKeyListener extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {
-            gm.getMyTank().keyPressed(e);
+            int key = e.getKeyCode();
+            if(key == KeyEvent.VK_S) save();
+            else if (key == KeyEvent.VK_L) load();
+            else gm.getMyTank().keyPressed(e);
         }
 
         @Override
         public void keyReleased(KeyEvent e) {
             gm.getMyTank().keyReleased(e);
+        }
+    }
+
+    private void save() {
+        ObjectOutputStream oos = null;
+        try {
+            File f = new File("/Users/leo/Documents/dev/tank.dat");
+            FileOutputStream fos = new FileOutputStream(f);
+            oos = new ObjectOutputStream(fos);
+            oos.writeObject(gm);
+            oos.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            if (oos!=null) {
+                try {
+                    oos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void load() {
+        ObjectInputStream ois = null;
+        try {
+            File f = new File("/Users/leo/Documents/dev/tank.dat");
+            FileInputStream fis = new FileInputStream(f);
+            ois = new ObjectInputStream(fis);
+            this.gm = (GameModel) ois.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally{
+            if (ois != null) {
+                try {
+                    ois.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

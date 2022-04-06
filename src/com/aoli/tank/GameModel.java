@@ -3,10 +3,11 @@ package com.aoli.tank;
 import com.aoli.tank.chainOfResponsibility.ColliderChain;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameModel {
+public class GameModel implements Serializable {
 
     private Player myTank;
     private List<AbstractGameObjects> objects;
@@ -43,7 +44,9 @@ public class GameModel {
                 objects.remove(i);
                 break;
             }
+        }
 
+        for (int i = 0; i < objects.size(); i++) {
             AbstractGameObjects go1 = objects.get(i);
             for (int j = 0; j < objects.size(); j++) {
                 AbstractGameObjects go2 = objects.get(j);
@@ -58,4 +61,5 @@ public class GameModel {
     public Player getMyTank(){
         return myTank;
     }
+
 }
