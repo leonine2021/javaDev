@@ -1,0 +1,12 @@
+1 网络模型
+    a 通讯方式：
+        TCP: 可靠连接，使命必达，速度慢
+        UDP：非可靠连接，速度快
+    b TCP的编程模型 BIO OIO
+        BIO: blocking IO
+        NIO: non-blocking IO -> 高并发时使用的模型
+        AIO: Async IO
+        NIO: 1）一个selector解决多线程问题 ByteBuffer难用，只有一个指针
+             2）一个selector + workers in thread pool
+2 Netty
+    a 封装了NIO， Bytebuf两个指针， 且内存访问效率高
