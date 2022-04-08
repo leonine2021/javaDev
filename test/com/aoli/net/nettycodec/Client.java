@@ -1,6 +1,6 @@
-package com.aoli.net.nettyChat;
+package com.aoli.net.nettycodec;
 
-import com.aoli.net.netty.NettyClient;
+import com.aoli.net.nettyChat.ClientFrame;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -24,7 +24,9 @@ public class Client {
                 @Override
                 protected void initChannel(SocketChannel socketChannel) throws Exception {
                     channel = socketChannel;
-                    socketChannel.pipeline().addLast(new MyHandler());
+                    socketChannel.pipeline()
+                            .addLast(new TankMsgEncoder())
+                            .addLast(new MyHandler());
                 }
             });
             ChannelFuture future = b.connect("localhost", 8888).sync();
@@ -49,6 +51,12 @@ public class Client {
     }
 
     static class MyHandler extends ChannelInboundHandlerAdapter {
+
+        @Override
+        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+            ctx.writeAndFlush(new TankMsg(5, 8));
+        }
+
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             System.out.println(msg.toString());
@@ -72,5 +80,10 @@ public class Client {
             cause.printStackTrace();
             ctx.close();
         }
+    }
+
+    public static void main(String[] args) {
+        Client c = new Client();
+        c.connect();
     }
 }

@@ -10,3 +10,6 @@
              2）一个selector + workers in thread pool
 2 Netty
     a 封装了NIO， Bytebuf两个指针， 且内存访问效率高
+
+
+    TCP 拆包与粘包

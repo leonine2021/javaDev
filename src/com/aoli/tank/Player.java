@@ -6,6 +6,7 @@ import com.aoli.tank.strategies.FourDirFire;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.UUID;
 
 public class Player extends AbstractGameObjects{
     public static final int SPEED = 5;
@@ -16,6 +17,9 @@ public class Player extends AbstractGameObjects{
     private boolean isLive = true;
     private Dir dir = Dir.R;
 
+    private UUID id = UUID.randomUUID();
+    private FireStrategy strategy = null;
+
     public Player(int x, int y, Dir dir, Group group){
         this.x = x;
         this.y = y;
@@ -23,6 +27,18 @@ public class Player extends AbstractGameObjects{
         this.group = group;
         // initialize the fire strategy only once from config file
         this.initFireStrategy();
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public boolean isMoving() {
+        return moving;
+    }
+
+    public void setMoving(boolean moving) {
+        this.moving = moving;
     }
 
     public boolean isLive() {
@@ -53,6 +69,11 @@ public class Player extends AbstractGameObjects{
         return dir;
     }
 
+    public void setDir(Dir dir) {
+        this.dir = dir;
+    }
+//记录键盘是否按下的变量
+
     public Group getGroup() {
         return group;
     }
@@ -60,28 +81,28 @@ public class Player extends AbstractGameObjects{
     public void setGroup(Group group) {
         this.group = group;
     }
-//记录键盘是否按下的变量
-
-    public void setDir(Dir dir) {
-        this.dir = dir;
-    }
 
     public void paint(Graphics g) {
 
         if (!this.isLive()) return;
 
+        Color c = g.getColor();
+        g.setColor(Color.YELLOW);
+        g.drawString(id.toString(), x, y-10);
+        g.setColor(c);
+
         switch (dir){
             case L:
-                g.drawImage(ResourceMgr.goodTankL, x, y, null);
+                g.drawImage(this.group.equals(Group.GOOD)? ResourceMgr.goodTankL : ResourceMgr.badTankL, x, y, null);
                 break;
             case U:
-                g.drawImage(ResourceMgr.goodTankU, x, y, null);
+                g.drawImage(this.group.equals(Group.GOOD)? ResourceMgr.goodTankU : ResourceMgr.badTankU, x, y, null);
                 break;
             case R:
-                g.drawImage(ResourceMgr.goodTankR, x, y, null);
+                g.drawImage(this.group.equals(Group.GOOD)? ResourceMgr.goodTankR : ResourceMgr.badTankR, x, y, null);
                 break;
             case D:
-                g.drawImage(ResourceMgr.goodTankD, x, y, null);
+                g.drawImage(this.group.equals(Group.GOOD)? ResourceMgr.goodTankD : ResourceMgr.badTankD, x, y, null);
                 break;
         }
         move();
@@ -169,7 +190,6 @@ public class Player extends AbstractGameObjects{
         setMainDir();
     }
 
-    private FireStrategy strategy = null;
     private void initFireStrategy(){
         String className = PropMgr.get("tankFireStrategy");
         try {

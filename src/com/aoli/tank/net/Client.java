@@ -1,6 +1,8 @@
-package com.aoli.net.nettyChat;
+package com.aoli.tank.net;
 
-import com.aoli.net.netty.NettyClient;
+//import com.aoli.net.nettyChat.ClientFrame;
+import com.aoli.tank.GameModel;
+import com.aoli.tank.TankFrame;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -12,7 +14,11 @@ import io.netty.util.ReferenceCountUtil;
 
 public class Client {
 
+    public static final Client INSTANCE = new Client();
+
     private Channel channel = null;
+
+    private Client(){}
 
     public void connect() {
         EventLoopGroup workerGroup = new NioEventLoopGroup(1);
@@ -24,7 +30,10 @@ public class Client {
                 @Override
                 protected void initChannel(SocketChannel socketChannel) throws Exception {
                     channel = socketChannel;
-                    socketChannel.pipeline().addLast(new MyHandler());
+                    socketChannel.pipeline()
+                            .addLast(new MsgEncoder())
+                            .addLast(new MsgDecoder())
+                            .addLast(new MyHandler());
                 }
             });
             ChannelFuture future = b.connect("localhost", 8888).sync();
@@ -39,32 +48,27 @@ public class Client {
         }
     }
 
-    public void send(String text) {
-        channel.writeAndFlush(Unpooled.copiedBuffer(text.getBytes()));
+    public void send(TankJoinMsg msg) {
+        channel.writeAndFlush(msg);
     }
 
     public void closeConnection() {
-        send("__bye__");
+
         channel.close();
     }
 
-    static class MyHandler extends ChannelInboundHandlerAdapter {
+    static class MyHandler extends SimpleChannelInboundHandler<TankJoinMsg> {
+
         @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+            ctx.writeAndFlush(new TankJoinMsg(TankFrame.INSTANCE.getGm().getMyTank()));
+        }
+
+
+        @Override
+        protected void channelRead0(ChannelHandlerContext ctx, TankJoinMsg msg) throws Exception {
             System.out.println(msg.toString());
-            ByteBuf buf = null;
-            try{
-                buf = (ByteBuf) msg;
-                byte[] bytes = new byte[buf.readableBytes()];
-                buf.getBytes(buf.readerIndex(), bytes);
-                String str = new String(bytes);
-                ClientFrame.INSTANCE.updateText(str);
-//            System.out.println(str);
-            }finally{
-                if(buf != null){
-                    ReferenceCountUtil.release(buf);
-                }
-            }
+            msg.handle();
         }
 
         @Override
@@ -72,5 +76,10 @@ public class Client {
             cause.printStackTrace();
             ctx.close();
         }
+    }
+
+    public static void main(String[] args) {
+        Client c = new Client();
+        c.connect();
     }
 }

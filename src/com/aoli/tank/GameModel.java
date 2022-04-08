@@ -6,6 +6,8 @@ import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 public class GameModel implements Serializable {
 
@@ -13,12 +15,19 @@ public class GameModel implements Serializable {
     private List<AbstractGameObjects> objects;
     ColliderChain chain = new ColliderChain();
 
+    Random r = new Random();
+
     public GameModel() {
         initGameObjects();
     }
 
     private void initGameObjects() {
-        myTank = new Player(100,100, Dir.R, Group.GOOD);
+
+
+        myTank = new Player(50 + r.nextInt(700),50 + r.nextInt(500),
+                Dir.values()[r.nextInt(Dir.values().length)],
+                Group.values()[r.nextInt(Group.values().length)]);
+
         objects = new ArrayList<>();
         int tankCount = Integer.parseInt(PropMgr.get("initTankCnt"));
         for (int i = 0; i < tankCount; i++){
@@ -62,4 +71,13 @@ public class GameModel implements Serializable {
         return myTank;
     }
 
+    public Tank findTankByUUID(UUID id) {
+        for(AbstractGameObjects o:objects){
+            if(o instanceof Tank){
+                Tank t = (Tank) o;
+                if (id.equals(t.getId()))return t;
+            }
+        }
+        return null;
+    }
 }
