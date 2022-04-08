@@ -85,6 +85,14 @@ public class Tank extends AbstractGameObjects{
         this.group = group;
     }
 
+    public void setMoving(boolean moving) {
+        this.moving = moving;
+    }
+
+    public void setDir(Dir dir) {
+        this.dir = dir;
+    }
+
     public void paint(Graphics g) {
 
         if (!this.isLive()) return;
@@ -130,10 +138,10 @@ public class Tank extends AbstractGameObjects{
                 break;
         }
         boundsCheck();
-        randomDir();
-        if (random.nextInt(100) > 90) {
-            fire();
-        }
+//        randomDir();
+//        if (random.nextInt(100) > 90) {
+//            fire();
+//        }
     }
 
     private void randomDir() {

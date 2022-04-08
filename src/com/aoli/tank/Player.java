@@ -1,8 +1,13 @@
 package com.aoli.tank;
 
+import com.aoli.tank.net.Client;
+import com.aoli.tank.net.Msg;
+import com.aoli.tank.net.TankStartMovingMsg;
+import com.aoli.tank.net.TankStopMsg;
 import com.aoli.tank.strategies.DefaultFire;
 import com.aoli.tank.strategies.FireStrategy;
 import com.aoli.tank.strategies.FourDirFire;
+import io.netty.bootstrap.Bootstrap;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -128,9 +133,12 @@ public class Player extends AbstractGameObjects{
     }
 
     private void setMainDir() {
+        Boolean oldMoving = moving;
+
         // all keys are released
         if (!bD && !bL && !bU && !bR){
             moving = false;
+            Client.INSTANCE.send(new TankStopMsg(this.id, this.x, this.y));
         }
         else {
             // any key is pressed
@@ -147,6 +155,8 @@ public class Player extends AbstractGameObjects{
             if (!bD && !bL && !bU && bR) {
                 dir = Dir.R;
             }
+            //发送消息到服务器（先判断之前的状态）
+            if (!oldMoving) Client.INSTANCE.send(new TankStartMovingMsg(this.id, this.x, this.y, this.dir));
         }
     }
 

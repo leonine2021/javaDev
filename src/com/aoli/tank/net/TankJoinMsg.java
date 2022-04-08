@@ -5,7 +5,7 @@ import com.aoli.tank.*;
 import java.io.*;
 import java.util.UUID;
 
-public class TankJoinMsg {
+public class TankJoinMsg extends Msg{
     private int x, y;
     private Dir dir;
     private boolean moving;
@@ -144,5 +144,10 @@ public class TankJoinMsg {
         TankFrame.INSTANCE.getGm().add(t);
 
         Client.INSTANCE.send(new TankJoinMsg(TankFrame.INSTANCE.getGm().getMyTank()));
+    }
+
+    @Override
+    public MsgType getMsgType() {
+        return MsgType.TankJoin;
     }
 }

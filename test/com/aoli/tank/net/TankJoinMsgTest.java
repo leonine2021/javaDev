@@ -1,7 +1,5 @@
 package com.aoli.tank.net;
 
-import com.aoli.net.nettycodec.TankMsg;
-import com.aoli.net.nettycodec.TankMsgDecoder;
 import com.aoli.tank.Dir;
 import com.aoli.tank.Group;
 import com.aoli.tank.Player;
@@ -14,7 +12,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MsgCodecTest {
+class TankJoinMsgTest {
 
     @Test
     void encode() {
@@ -28,7 +26,7 @@ class MsgCodecTest {
         ch.writeOutbound(tjm);
 
         ByteBuf buf = ch.readOutbound();
-
+        MsgType msgType = MsgType.values()[buf.readInt()];
         int length = buf.readInt();
         int x = buf.readInt();
         int y = buf.readInt();
@@ -37,6 +35,7 @@ class MsgCodecTest {
         Group group = Group.values()[buf.readInt()];
         UUID id = new UUID(buf.readLong(), buf.readLong());
 
+        assertEquals(MsgType.TankJoin,msgType);
         assertEquals(33,length);
         assertEquals(50, x);
         assertEquals(100, y);
@@ -54,6 +53,7 @@ class MsgCodecTest {
         UUID id = UUID.randomUUID();
 
         ByteBuf buf = Unpooled.buffer();
+        buf.writeInt(MsgType.TankJoin.ordinal());
         buf.writeInt(33);
         buf.writeInt(5);
         buf.writeInt(8);
