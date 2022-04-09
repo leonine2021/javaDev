@@ -7,17 +7,19 @@ import com.aoli.tank.TankFrame;
 import java.io.*;
 import java.util.UUID;
 
-public class TankStopMsg extends Msg{
+public class TankMoveOrChangeDirMsg extends Msg{
     private UUID id;
     private int x, y;
+    private Dir dir;
 
-    public TankStopMsg(UUID id, int x, int y) {
+    public TankMoveOrChangeDirMsg(UUID id, int x, int y, Dir dir) {
         this.id = id;
         this.x = x;
         this.y = y;
+        this.dir = dir;
     }
 
-    public TankStopMsg() {}
+    public TankMoveOrChangeDirMsg() {}
 
     public UUID getId() {
         return id;
@@ -43,6 +45,14 @@ public class TankStopMsg extends Msg{
         this.y = y;
     }
 
+    public Dir getDir() {
+        return dir;
+    }
+
+    public void setDir(Dir dir) {
+        this.dir = dir;
+    }
+
     @Override
     public byte[] toBytes(){
         ByteArrayOutputStream baos = null;
@@ -57,6 +67,7 @@ public class TankStopMsg extends Msg{
             dos.writeLong(id.getLeastSignificantBits());
             dos.writeInt(x);
             dos.writeInt(y);
+            dos.writeInt(dir.ordinal());
 
             dos.flush();
             bytes = baos.toByteArray();
@@ -81,6 +92,7 @@ public class TankStopMsg extends Msg{
             this.id = new UUID(dis.readLong(), dis.readLong());
             this.x = dis.readInt();
             this.y = dis.readInt();
+            this.dir = Dir.values()[dis.readInt()];
         }catch(IOException e){
             e.printStackTrace();
         }finally{
@@ -94,30 +106,32 @@ public class TankStopMsg extends Msg{
 
     @Override
     public void handle() {
-
         if(this.id.equals(TankFrame.INSTANCE.getGm().getMyTank().getId())){
             return;
         }
         Tank t = TankFrame.INSTANCE.getGm().findTankByUUID(this.id);
 
         if(t != null){
-            t.setMoving(false);
+            t.setMoving(true);
             t.setX(this.x);
             t.setY(this.y);
+            t.setDir(this.dir);
         }
+
     }
 
     @Override
     public MsgType getMsgType() {
-        return MsgType.TankStop;
+        return MsgType.TankMoveOrChangeDir;
     }
 
     @Override
     public String toString() {
-        return "TanksStopMsg{" +
+        return "TankMoveOrChangeDirMsg{" +
                 "id=" + id +
                 ", x=" + x +
                 ", y=" + y +
+                ", dir=" + dir +
                 '}';
     }
 }

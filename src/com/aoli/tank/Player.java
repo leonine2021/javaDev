@@ -1,13 +1,10 @@
 package com.aoli.tank;
 
+import com.aoli.tank.net.BulletNewMsg;
 import com.aoli.tank.net.Client;
-import com.aoli.tank.net.Msg;
-import com.aoli.tank.net.TankStartMovingMsg;
+import com.aoli.tank.net.TankMoveOrChangeDirMsg;
 import com.aoli.tank.net.TankStopMsg;
-import com.aoli.tank.strategies.DefaultFire;
 import com.aoli.tank.strategies.FireStrategy;
-import com.aoli.tank.strategies.FourDirFire;
-import io.netty.bootstrap.Bootstrap;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -134,7 +131,7 @@ public class Player extends AbstractGameObjects{
 
     private void setMainDir() {
         Boolean oldMoving = moving;
-
+        Dir oldDir = this.getDir();
         // all keys are released
         if (!bD && !bL && !bU && !bR){
             moving = false;
@@ -156,7 +153,8 @@ public class Player extends AbstractGameObjects{
                 dir = Dir.R;
             }
             //发送消息到服务器（先判断之前的状态）
-            if (!oldMoving) Client.INSTANCE.send(new TankStartMovingMsg(this.id, this.x, this.y, this.dir));
+            if (!oldMoving) Client.INSTANCE.send(new TankMoveOrChangeDirMsg(this.id, this.x, this.y, this.dir));
+            if(!this.dir.equals(oldDir)) Client.INSTANCE.send(new TankMoveOrChangeDirMsg(this.id, this.x, this.y, this.dir));
         }
     }
 
@@ -215,5 +213,6 @@ public class Player extends AbstractGameObjects{
     }
     public void die() {
         this.setLive(false);
+        TankFrame.INSTANCE.getGm().add(new Explosion(x, y));
     }
 }

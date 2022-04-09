@@ -1,8 +1,6 @@
 package com.aoli.tank.net;
 
 import com.aoli.tank.Dir;
-import com.aoli.tank.Group;
-import com.aoli.tank.Player;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -13,7 +11,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TankStartMovingMsgTest {
+class TankMoveOrChangeDirMsgTest {
 
     @Test
     void encode() {
@@ -21,7 +19,7 @@ class TankStartMovingMsgTest {
 
         ch.pipeline().addLast(new MsgEncoder());
 
-        TankStartMovingMsg msg = new TankStartMovingMsg(UUID.randomUUID(), 50, 100, Dir.D);
+        TankMoveOrChangeDirMsg msg = new TankMoveOrChangeDirMsg(UUID.randomUUID(), 50, 100, Dir.D);
 
         ch.writeOutbound(msg);
 
@@ -34,7 +32,7 @@ class TankStartMovingMsgTest {
         int y = buf.readInt();
         Dir dir = Dir.values()[buf.readInt()];
 
-        assertEquals(MsgType.TankStartMoving,msgType);
+        assertEquals(MsgType.TankMoveOrChangeDir,msgType);
         assertEquals(28,length);
         assertEquals(50, x);
         assertEquals(100, y);
@@ -49,7 +47,7 @@ class TankStartMovingMsgTest {
         UUID id = UUID.randomUUID();
 
         ByteBuf buf = Unpooled.buffer();
-        buf.writeInt(MsgType.TankStartMoving.ordinal());
+        buf.writeInt(MsgType.TankMoveOrChangeDir.ordinal());
         buf.writeInt(28);
         buf.writeLong(id.getMostSignificantBits());
         buf.writeLong(id.getLeastSignificantBits());
@@ -60,7 +58,7 @@ class TankStartMovingMsgTest {
 
         ch.writeInbound(buf);
 
-        TankStartMovingMsg msg = ch.readInbound();
+        TankMoveOrChangeDirMsg msg = ch.readInbound();
 
         assertEquals(id, msg.getId());
         assertEquals(5, msg.getX());

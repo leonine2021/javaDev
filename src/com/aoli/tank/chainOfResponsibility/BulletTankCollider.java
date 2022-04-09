@@ -4,6 +4,8 @@ import com.aoli.tank.AbstractGameObjects;
 import com.aoli.tank.Bullet;
 import com.aoli.tank.ResourceMgr;
 import com.aoli.tank.Tank;
+import com.aoli.tank.net.Client;
+import com.aoli.tank.net.TankDieMsg;
 
 import java.awt.*;
 
@@ -19,6 +21,9 @@ public class BulletTankCollider implements Collider{
             if (b.getRect().intersects(rectTank)){
                 b.die();
                 t.die();
+
+                Client.INSTANCE.send(new TankDieMsg(t.getId(), b.getId()));
+
                 return false;
             }
         }else if (go1 instanceof Tank && go2 instanceof Bullet){

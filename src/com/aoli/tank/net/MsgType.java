@@ -1,5 +1,5 @@
 package com.aoli.tank.net;
 
 public enum MsgType {
-    TankJoin, TankStartMoving, TankStop
+    TankJoin, TankMoveOrChangeDir, TankStop, BulletNew, TankDie
 }
